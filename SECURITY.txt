@@ -1,0 +1,87 @@
+private Vector<?> aTtableData = new Vector<>();
+
+            //CHECK FOR THJE SYSTEM SECURITY
+            System.out.println(sys.getAllDetails());
+            aTtableData = sys.getAllDetails().get("tableData");
+
+            if (aTtableData.isEmpty()) {
+                // System.out.println();
+                /*FIRST TIME---  INSERT DATA TO THE DATABASE AND CONTINUE THE SYSTEM LOADING*/
+                sysData.put("sys_name", "Information Management System");
+                sysData.put("user", "");
+                sysData.put("day_1", gen.getTodayDate("underscore"));
+                sysData.put("code", sec.securityLockingCode());
+                sysData.put("day_register", "");
+                sysData.put("register_code", "");
+                sysData.put("state", "Not Activated");
+
+                sys.setActivationDetails(sysData);
+                Thread.sleep(3000);
+            } else {
+                //NOT FIRST TIME
+                //GET ALL THE DETAILS
+
+                String strSysName, strUser, strDay1, strCode, strDayRegister, strRegisterCode, strStatus;
+
+                objSysSec = aTtableData.toArray();
+                strSysSec = objSysSec[0].toString().split(",\\s*");
+
+                strSysName = strSysSec[0].substring(1);
+                strUser = strSysSec[1];
+                strDay1 = strSysSec[2];
+                strCode = strSysSec[3];
+                strDayRegister = strSysSec[4];
+                strRegisterCode = strSysSec[5];
+                strStatus = strSysSec[6].substring(0, strSysSec[6].length() - 1);
+
+                //CHECK IF ITS ACTIVATED
+                if (strStatus.equals("Activated")) {
+                    System.out.println(strStatus);
+                    Thread.sleep(3000);
+                } else {
+
+                    //CHECK FOR THE DATE
+                    //FIRST DAY TO BE USED
+                    String d1Day, d1Month, d1Year;
+                    String strD1[] = strDay1.split("_\\s*");
+
+                    d1Day = strD1[0];
+                    d1Month = strD1[1];
+                    d1Year = strD1[2];
+
+                    //TODAY DATE
+                    String d2Day, d2Month, d2Year;
+                    String str2Day[] = gen.getTodayDate("forwardslash").split("/\\s*");
+
+                    d2Day = str2Day[0];
+                    d2Month = str2Day[1];
+                    d2Year = str2Day[2];
+
+                    if ((Integer.parseInt(d2Day) - Integer.parseInt(d1Day)) >= 1 && (Integer.parseInt(d2Month) - Integer.parseInt(d1Month)) >= 1 && Integer.parseInt(d2Year) >= Integer.parseInt(d1Year)) {
+
+                        //NEEDS ACTIVATION
+                        System.out.println("Needs Activation");
+                        strState = "Needs Activation";
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Send this Code:\n" + strCode + "\nto +254710135636 \nobtain your registration code",
+                                strSysName,
+                                JOptionPane.INFORMATION_MESSAGE);
+
+                    } else {
+
+                        //CONTINUE LOADING
+                        System.out.println("Continue loading");
+                        try {
+                            Thread.sleep(2000);
+                            Class.forName("com.Loader").getMethod("timerLoader", new Class[] {String[].class});
+                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+                            Logger.getLogger(SplashScreen.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
+            }
+
+			System.out.println("Continue loading");
+            return strState;
